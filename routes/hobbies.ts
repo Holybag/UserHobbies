@@ -1,23 +1,28 @@
-"use strict";
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var User = require('../models/userModel');
 var Hobby = require('../models/hobbyModel');
+
 var router = express.Router();
+
+
 //////// mongoose /////////
 mongoose.connect('mongodb://localhost/userHobbies', { useNewUrlParser: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'mongodb connection error'));
-db.once('open', function () {
+db.once('open', function() {
     console.log('mongodb connection succeed');
 });
+
 /**
  * @swagger
  * tags:
  *    name: hobbies
  *    description: manage hobbies information
  */
+
+ 
 /**
  * @swagger
  *  paths:
@@ -30,18 +35,20 @@ db.once('open', function () {
  *          200:
  *            description: succeed
  *          400:
- *            description: response error
+ *            description: response error         
  */
-router.get('/', function (req, res, next) {
-    Hobby.find({}, null, function (err, docs) {
+router.get('/', function(req:any, res:any, next:any){
+
+    Hobby.find({}, null, function(err:any, docs:any){
         if (err) {
             res.send({ result: false, message: err });
-        }
-        else {
+        } else {
             res.send(docs);
         }
     });
+
 });
+
 /**
  * @swagger
  *  paths:
@@ -53,25 +60,27 @@ router.get('/', function (req, res, next) {
  *          - in: query
  *            name: id
  *            type: string
- *            description: user id
- *
+ *            description: user id             
+ *            
  *        responses:
  *          200:
  *            description: succeed
  *          400:
- *            description: response error
+ *            description: response error         
  */
-router.get('/:userId', function (req, res, next) {
+router.get('/:userId', function(req:any, res:any, next:any){
+    
     var id = req.params.userId;
-    Hobby.findById(id, null, function (err, doc) {
+
+    Hobby.findById(id, null, function(err:any, doc:any){
         if (err) {
             res.send({ result: false, message: err });
-        }
-        else {
+        } else {
             res.send(doc);
         }
     });
 });
+
 /**
  * @swagger
  *  paths:
@@ -96,58 +105,60 @@ router.get('/:userId', function (req, res, next) {
  *            name: year
  *            type: string
  *            description: how long having the hobby
- *
+ *            
  *        responses:
  *          200:
  *            description: succeed
  *          400:
- *            description: response error
+ *            description: response error         
  */
-router.post('/', function (req, res, next) {
-    var userId = req.body.userId;
+router.post('/', function(req:any, res:any, next:any){
+
+    var userId = req.body.userId;    
     var passionLevel = req.body.passionLevel;
     var name = req.body.name;
     var year = req.body.year;
-    var hobby = new Hobby({
+
+    var hobby = new Hobby({        
         passionLevel: passionLevel,
         name: name,
         year: parseInt(year)
     });
-    hobby.save(function (errSave, savedHobby) {
+
+    hobby.save( function(errSave:any, savedHobby:any) {
         if (errSave) {
             res.send({ result: false, message: errSave });
-        }
-        else {
+        } else {
             var savedId = savedHobby._id;
             console.log(savedId.toString());
-            User.findById(userId, null, function (errFindById, docUser) {
+
+            User.findById(userId, null, function(errFindById:any, docUser:any){
                 if (errFindById) {
                     res.send({ result: false, message: errFindById });
-                }
-                else {
+                } else {
                     var hobbies = docUser.hobbies;
                     hobbies.push(savedHobby._id);
-                    User.updateOne({ _id: userId }, { hobbies: hobbies }, function (errUpdateOne, result) {
+                    User.updateOne({ _id: userId }, { hobbies: hobbies }, function(errUpdateOne:any, result:any){
                         if (errUpdateOne) {
                             res.send({ result: false, message: errUpdateOne });
-                        }
-                        else {
-                            User.findById(userId).populate('hobbies').exec(function (errFindById2, populatedDoc) {
+                        } else {
+                            User.findById(userId).populate('hobbies').exec(function(errFindById2:any, populatedDoc:any){
                                 if (errFindById2) {
                                     res.send({ result: false, message: errFindById2 });
-                                }
-                                else {
+                                } else {
                                     console.log(populatedDoc.populated('hobbies'));
                                     res.send(populatedDoc);
                                 }
-                            });
+                            });                           
                         }
-                    });
+                    });                    
                 }
             });
         }
     });
+
 });
+
 /**
  * @swagger
  *  paths:
@@ -164,68 +175,63 @@ router.post('/', function (req, res, next) {
  *            name : hobbyId
  *            type: string
  *            description: hobby id
- *
+ *            
  *        responses:
  *          200:
  *            description: succeed
  *          400:
- *            description: response error
+ *            description: response error         
  */
-router.delete('/', function (req, res, next) {
+router.delete('/', function(req:any, res:any, next:any){
     var userId = req.body.userId;
     var hobbyId = req.body.hobbyId;
+
     if (userId) {
-        Hobby.deleteOne({ _id: hobbyId }, function (err) {
+        Hobby.deleteOne({ _id: hobbyId }, function(err:any){
             if (err) {
                 res.send({ result: false, message: err });
-            }
-            else {
-                User.findById(userId, null, function (errFindById, docUser) {
+            } else {
+                User.findById(userId, null, function(errFindById:any, docUser:any){
                     if (errFindById) {
                         res.send({ result: false, message: errFindById });
-                    }
-                    else {
-                        var hobbyIds = docUser.hobbies;
+                    } else {
+                        var hobbyIds = docUser.hobbies; 
                         var newHobbies = [];
-                        for (var _i = 0, hobbyIds_1 = hobbyIds; _i < hobbyIds_1.length; _i++) {
-                            var hId = hobbyIds_1[_i];
-                            var hIdString = hId._id.toString();
-                            if (hIdString !== hobbyId) {
+                        for(const hId of hobbyIds){
+                            var hIdString = hId._id.toString();                   
+                            if (hIdString !== hobbyId){
                                 newHobbies.push(hId);
                             }
-                        }
-                        User.updateOne({ _id: userId }, { hobbies: newHobbies }, function (errUpdateOne, result) {
+                        }                    
+                        User.updateOne({ _id: userId }, { hobbies: newHobbies }, function(errUpdateOne:any, result:any){
                             if (errUpdateOne) {
                                 res.send({ result: false, message: errUpdateOne });
-                            }
-                            else {
-                                User.findById(userId).populate('hobbies').exec(function (errFindById2, populatedDoc) {
+                            } else {
+                                User.findById(userId).populate('hobbies').exec(function(errFindById2:any, populatedDoc:any){
                                     if (errFindById2) {
                                         res.send({ result: false, message: errFindById2 });
-                                    }
-                                    else {
+                                    } else {
                                         console.log(populatedDoc.populated('hobbies'));
                                         res.send(populatedDoc);
                                     }
-                                });
+                                });                           
                             }
-                        });
+                        });                    
                     }
                 });
             }
         });
-    }
-    else {
-        Hobby.deleteMany({}, function (err) {
-            if (err) {
-                res.send({ result: false, message: err });
+    } else {
+        Hobby.deleteMany({}, function(err:any){
+            if (err){
+                res.send({ result: false, message: err})
+            } else {
+                res.send({ result: true, message: ''})
             }
-            else {
-                res.send({ result: true, message: '' });
-            }
-        });
-    }
-});
+        })
+    }    
+})
+
 /**
  * @swagger
  *  paths:
@@ -250,25 +256,29 @@ router.delete('/', function (req, res, next) {
  *            name: year
  *            type: number
  *            description: how many years having the hobby
- *
+ *            
  *        responses:
  *          200:
  *            description: succeed
  *          400:
- *            description: response error
+ *            description: response error         
  */
-router.put('/:id', function (req, res, next) {
+router.put('/:id', function(req:any, res:any, next:any){
+
     var id = req.params.id;
     var name = req.body.name;
     var passionLevel = req.body.passionLevel;
     var year = req.body.year;
-    Hobby.updateOne({ _id: id }, { name: name, passionLevel: passionLevel, year: parseInt(year) }, function (err, result) {
+
+    Hobby.updateOne({ _id: id }, { name: name, passionLevel: passionLevel, year: parseInt(year) }, function(err:any, result:any){
         if (err) {
             res.status(400).send({ result: false, message: err });
-        }
-        else {
+        } else {
             res.send({ result: true, message: result.nModified });
         }
     });
 });
-module.exports = router;
+
+
+
+export = router;
