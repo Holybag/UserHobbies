@@ -97,6 +97,10 @@ router.get('/:id', function (req, res, next) {
 router.post('/', function (req, res, next) {
     var name = req.body.name;
     //var hobbies = req.body.hobbies;
+    if (!name) {
+        res.status(400).send({ result: false, message: 'name is required' });
+        return;
+    }
     var user = new User({
         //id: new mongoose.Types.ObjectId,
         name: name,
@@ -106,7 +110,7 @@ router.post('/', function (req, res, next) {
             res.status(400).send({ result: false, message: error });
         }
         else {
-            res.send({ result: true, message: "" });
+            res.send({ result: true, message: "user is added" });
         }
     });
 });
@@ -133,6 +137,14 @@ router.put('/:id', function (req, res, next) {
     var id = req.params.id;
     var name = req.body.name;
     //var hobbies = req.body.hobbies;
+    if (!id) {
+        res.status(400).send({ result: false, message: 'id is required in query string' });
+        return;
+    }
+    else if (!name) {
+        res.status(400).send({ result: false, message: 'name is required in body' });
+        return;
+    }
     User.updateOne({ _id: id }, { name: name }, function (err, result) {
         if (err) {
             res.status(400).send({ result: false, message: err });
@@ -162,7 +174,7 @@ router.delete('/', function (req, res, next) {
             res.status(400).send({ result: false, message: err });
         }
         else {
-            res.send({ result: true, message: '' });
+            res.send({ result: true, message: 'All users are deleted' });
         }
     });
 });
@@ -190,9 +202,11 @@ router.delete('/:id', function (req, res, next) {
     User.deleteOne({ _id: id }, function (err) {
         if (err) {
             res.send({ result: false, message: err });
+            return;
         }
         else {
-            res.send({ result: true, message: '' });
+            res.send({ result: true, message: 'One user is deleted' });
+            return;
         }
     });
 });

@@ -108,6 +108,22 @@ router.post('/', function (req, res, next) {
     var passionLevel = req.body.passionLevel;
     var name = req.body.name;
     var year = req.body.year;
+    if (!userId) {
+        res.status(400).send({ result: false, message: 'userId is required in body' });
+        return;
+    }
+    else if (!passionLevel) {
+        res.status(400).send({ result: false, message: 'passionLevel is required in body' });
+        return;
+    }
+    else if (!name) {
+        res.status(400).send({ result: false, message: 'name is required in body' });
+        return;
+    }
+    else if (!year) {
+        res.status(400).send({ result: false, message: 'year is required in body' });
+        return;
+    }
     var hobby = new Hobby({
         passionLevel: passionLevel,
         name: name,
@@ -115,26 +131,26 @@ router.post('/', function (req, res, next) {
     });
     hobby.save(function (errSave, savedHobby) {
         if (errSave) {
-            res.send({ result: false, message: errSave });
+            res.status(400).send({ result: false, message: errSave });
         }
         else {
             var savedId = savedHobby._id;
             console.log(savedId.toString());
             User.findById(userId, null, function (errFindById, docUser) {
                 if (errFindById) {
-                    res.send({ result: false, message: errFindById });
+                    res.status(400).send({ result: false, message: errFindById });
                 }
                 else {
                     var hobbies = docUser.hobbies;
                     hobbies.push(savedHobby._id);
                     User.updateOne({ _id: userId }, { hobbies: hobbies }, function (errUpdateOne, result) {
                         if (errUpdateOne) {
-                            res.send({ result: false, message: errUpdateOne });
+                            res.status(400).send({ result: false, message: errUpdateOne });
                         }
                         else {
                             User.findById(userId).populate('hobbies').exec(function (errFindById2, populatedDoc) {
                                 if (errFindById2) {
-                                    res.send({ result: false, message: errFindById2 });
+                                    res.status(400).send({ result: false, message: errFindById2 });
                                 }
                                 else {
                                     console.log(populatedDoc.populated('hobbies'));
@@ -175,14 +191,18 @@ router.delete('/', function (req, res, next) {
     var userId = req.body.userId;
     var hobbyId = req.body.hobbyId;
     if (userId) {
+        if (!hobbyId) {
+            res.status(400).send({ result: false, message: 'hobbyId is required in body' });
+            return;
+        }
         Hobby.deleteOne({ _id: hobbyId }, function (err) {
             if (err) {
-                res.send({ result: false, message: err });
+                res.status(400).send({ result: false, message: err });
             }
             else {
                 User.findById(userId, null, function (errFindById, docUser) {
                     if (errFindById) {
-                        res.send({ result: false, message: errFindById });
+                        res.status(400).send({ result: false, message: errFindById });
                     }
                     else {
                         var hobbyIds = docUser.hobbies;
@@ -196,12 +216,12 @@ router.delete('/', function (req, res, next) {
                         }
                         User.updateOne({ _id: userId }, { hobbies: newHobbies }, function (errUpdateOne, result) {
                             if (errUpdateOne) {
-                                res.send({ result: false, message: errUpdateOne });
+                                res.status(400).send({ result: false, message: errUpdateOne });
                             }
                             else {
                                 User.findById(userId).populate('hobbies').exec(function (errFindById2, populatedDoc) {
                                     if (errFindById2) {
-                                        res.send({ result: false, message: errFindById2 });
+                                        res.status(400).send({ result: false, message: errFindById2 });
                                     }
                                     else {
                                         console.log(populatedDoc.populated('hobbies'));
@@ -218,10 +238,10 @@ router.delete('/', function (req, res, next) {
     else {
         Hobby.deleteMany({}, function (err) {
             if (err) {
-                res.send({ result: false, message: err });
+                res.status(400).send({ result: false, message: err });
             }
             else {
-                res.send({ result: true, message: '' });
+                res.send({ result: true, message: 'All hobbies are deleted' });
             }
         });
     }
@@ -262,6 +282,22 @@ router.put('/:id', function (req, res, next) {
     var name = req.body.name;
     var passionLevel = req.body.passionLevel;
     var year = req.body.year;
+    if (!id) {
+        res.status(400).send({ result: false, message: 'id is required in query string' });
+        return;
+    }
+    else if (!name) {
+        res.status(400).send({ result: false, message: 'name is required in body' });
+        return;
+    }
+    else if (!passionLevel) {
+        res.status(400).send({ result: false, message: 'passionLevel is required in body' });
+        return;
+    }
+    else if (!year) {
+        res.status(400).send({ result: false, message: 'year is required in body' });
+        return;
+    }
     Hobby.updateOne({ _id: id }, { name: name, passionLevel: passionLevel, year: parseInt(year) }, function (err, result) {
         if (err) {
             res.status(400).send({ result: false, message: err });
