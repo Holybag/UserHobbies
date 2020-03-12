@@ -72,15 +72,30 @@ router.get('/', function(req:any, res:any, next:any) {
  */
 router.get('/:id', function(req:any, res:any, next:any) {
   var id = req.params.id;
+  
+  // User.findById(id, null, function(err:any, doc:any){
+  //   if (err) {
+  //       res.send({ result: false, message: err });
+  //   } else {
+  //       res.send(doc);
+  //   }
+  // });
 
-  User.findById(id).populate('hobbies').exec(function(err:any, doc:any){    
-    if (err) {
-      res.status(400).send({ result: false, message: err })
+  User.count({_id: id}, function(err:any, count:any){
+    if (count > 0){
+      User.findById(id).populate('hobbies').exec(function(err2:any, doc2:any){    
+        if (err2) {
+          res.status(400).send({ result: false, message: err2 })
+        } else {
+          console.log(doc2.populated('hobbies'));
+          res.send(doc2);
+        }
+      });
     } else {
-      console.log(doc.populated('hobbies'));
-      res.send(doc);
-    }
-  });
+      res.send({ result: true, message: [] });
+    }   
+  })
+  
 })
 
 /**
@@ -107,6 +122,11 @@ router.post('/', function(req:any, res:any, next:any){
   var name = req.body.name;
   //var hobbies = req.body.hobbies;
 
+  if (!name){
+    res.status(400).send({ result:false, message: 'name is required' });
+    return;
+  }
+
   var user = new User({
     //id: new mongoose.Types.ObjectId,
     name: name,
@@ -116,7 +136,7 @@ router.post('/', function(req:any, res:any, next:any){
     if (error) {
       res.status(400).send({ result: false, message: error });      
     } else {
-      res.send({ result: true, message: "" });
+      res.send({ result: true, message: "user is added" });
     }    
   });
 
@@ -146,6 +166,14 @@ router.put('/:id', function(req:any, res:any, next:any){
   var id = req.params.id;
   var name = req.body.name;
   //var hobbies = req.body.hobbies;
+
+  if(!id){
+    res.status(400).send({ result: false, message: 'id is required in query string' });
+    return;
+  } else if (!name) {
+    res.status(400).send({ result: false, message: 'name is required in body' });
+    return;
+  }
 
   User.updateOne({ _id: id }, { name: name }, function(err:any, result:any){
     if (err) {
@@ -177,7 +205,7 @@ router.delete('/', function(req:any, res:any, next:any){
     if (err) {
       res.status(400).send({ result: false, message: err });
     } else {
-      res.send({ result: true, message: '' });
+      res.send({ result: true, message: 'All users are deleted' });
     }
   });
 
@@ -205,11 +233,14 @@ router.delete('/', function(req:any, res:any, next:any){
 router.delete('/:id', function(req:any, res:any, next:any){
 
   var id = req.params.id;
+  
   User.deleteOne({ _id: id }, function(err:any) {
     if (err) {
       res.send({ result: false, message: err });
+      return;
     } else {
-      res.send({ result: true, message: '' });
+      res.send({ result: true, message: 'One user is deleted' });
+      return;
     }
   });
 

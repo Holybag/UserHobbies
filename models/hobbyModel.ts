@@ -7,4 +7,4 @@ const hobbySchema = new mongoose.Schema({
     year : Number
 });
 
-module.exports = mongoose.model('Hobby', hobbySchema, 'hobbies');
+export = mongoose.model('Hobby', hobbySchema, 'hobbies');
