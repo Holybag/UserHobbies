@@ -32,6 +32,22 @@
   npm install
   ```
   
+  ### How to run development
+  
+  To start the development server, run the following
+
+  ```bash
+  npm run dev
+  ```
+
+  ### How to build typescript
+  
+  To build the development, run the following
+
+  ```bash
+  npm tsc
+  ```
+  
   ### How to run
   
   To start the express server, run the following
