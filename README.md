@@ -32,6 +32,22 @@
   npm install
   ```
   
+  ### How to run development
+  
+  To start the development server, run the following
+
+  ```bash
+  npm run dev
+  ```
+
+  ### How to build typescript
+  
+  To build the development, run the following
+
+  ```bash
+  tsc
+  ```
+  
   ### How to run
   
   To start the express server, run the following
@@ -40,5 +56,14 @@
   npm run start
   ```
 
+  ### How to test
+  
+  To test, run the following
+
+  ```bash
+  npm run test
+  ```
+
   Open [http://localhost:3000](http://localhost:3000) and take a look around.
+  REST API Doc is [http://localhost:3000/api-docs/](http://localhost:3000/api-docs/).
 
