@@ -45,7 +45,7 @@
   To build the development, run the following
 
   ```bash
-  npm tsc
+  tsc
   ```
   
   ### How to run
