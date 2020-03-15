@@ -4,7 +4,7 @@
 ## Project Information
 
   ### Tech stack
-    * Nodejs with Typescript, MongoDB with mongoose, Test with Mocha
+    * Nodejs with Typescript, MongoDB with mongoose
     
   ### Tech details
     * Nodejs with Typescript
@@ -12,9 +12,7 @@
     * There are 2 different Mongo collections: User {id, name, gobbies}, Hobbies{id, passionLevel, name, year}
     * Hobbies are not embedded in the User Schema (used Mongo refs)
     * Endpoints are CRUD of users and hobbies.
-    * Swagger used
-    * Unit test by Mocha
-
+    
   ### Requirements
     * Node 12
     * MongoDB 4.2
