@@ -56,14 +56,7 @@
   npm run start
   ```
 
-  ### How to test
-  
-  To test, run the following
-
-  ```bash
-  npm run test
-  ```
 
   Open [http://localhost:3000](http://localhost:3000) and take a look around.
-  REST API Doc is [http://localhost:3000/api-docs/](http://localhost:3000/api-docs/).
+
 
